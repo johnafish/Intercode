@@ -5,7 +5,7 @@
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-	<script src="https://cdn.firebase.com/js/client/2.4.1/firebase.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
 	<script type="text/javascript" src="js/jquery.lightbox_me.js"></script>
 
 	<script type="text/javascript" src="js/themes.js"></script>
@@ -23,7 +23,7 @@
 <ul>
 <li><a href="learning.html">Lessons</a></li>
 <li><a href="#" class="active">Profile</a></li>
-<li><a href="#" onclick="ref.unauth();window.location.href=('index.html');">Logout</a></li>
+<li><a href="#" onclick="firebase.auth().signOut();window.location.href=('index.html');">Logout</a></li>
 </ul>
 </section>
 <div class="spinner"></div>

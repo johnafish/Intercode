@@ -1,8 +1,19 @@
-var ref = new Firebase("https://intercoding.firebaseio.com");
+var config = {
+	apiKey: "AIzaSyAuD-svvtckbaU54PrAh6ntfpr1TuvLDUc",
+	authDomain: "intercoding-metro.firebaseapp.com",
+	databaseURL: "https://intercoding-metro.firebaseio.com",
+	storageBucket: "intercoding-metro.appspot.com",
+};
+firebase.initializeApp(config);
+
 $(document).ready(function(){
-	if(ref.getAuth()){
-		window.location.replace("learning.html");
-	}
+	firebase.auth().onAuthStateChanged(function(user) {
+		if(user){
+			window.location.replace("learning.html");
+		}
+	});
+
+
 	$("#getstarted").on("click", function(){
 		$("#signuparea").removeClass("shake");
 		$("#loginarea").removeClass("shake");
@@ -18,33 +29,16 @@ $(document).ready(function(){
 		$(".notloading").css("display", "none");
 		$(".spinner").css("display", "block");
 		$("#signuparea").removeClass("shake");
-		ref.createUser({
-			email: $("#signemail").val(),
-			password: $("#signpassword").val()
-		}, function(error, userData){
-		  if (error) {
+		firebase.auth().createUserWithEmailAndPassword($("#signemail").val(), $("#signpassword").val()).then(function(){
+			firebase.database().ref("users/"+firebase.auth().currentUser.uid+"/active/").push().set("default")
+			console.log("doing stuff");
+		}).catch(function(error){
 		  	$(".notloading").css("display", "block");
 			$(".spinner").css("display", "none");
 		  	$("#signuparea").addClass("shake");
 		    console.log("Error creating user:", error);
-		  } else {
-		  	console.log("Signed up!")
-		    ref.authWithPassword({
-				email    : $("#signemail").val(),
-				password : $("#signpassword").val()
-			}, function(error, authData) {
-				if (error) {
-					console.log("Login Failed!", error);
-					$(".notloading").css("display", "block");
-					$(".spinner").css("display", "none");
-					$("#signuparea").addClass("shake");
-				} else {
-					ref.child("users").child(ref.getAuth().uid).child("active").push().set("default");
-					window.location.replace("learning.html");
-			  	}
-			});
-		  }
-		});
+		})
+		
 	});
 
 	$("#loginlink").on("click", function(){
@@ -62,19 +56,12 @@ $(document).ready(function(){
 		$("#loginarea").removeClass("shake");
 		$(".notloading").css("display", "none");
 		$(".spinner").css("display", "block");
-        ref.authWithPassword({
-			email    : $("#logemail").val(),
-			password : $("#logpassword").val()
-		}, function(error, authData) {
-			if (error) {
-				console.log("Login Failed!", error);
-				$(".notloading").css("display", "block");
-				$(".spinner").css("display", "none");
-				$("#loginarea").addClass("shake");
-			} else {
-				window.location.replace("learning.html");
-		  	}
-		});
+        firebase.auth().signInWithEmailAndPassword($("#logemail").val(), $("#logpassword").val()).catch(function(error){
+        	console.log("Login Failed!", error);
+			$(".notloading").css("display", "block");
+			$(".spinner").css("display", "none");
+			$("#loginarea").addClass("shake");
+        });
 	});
 
 	$("#resignup").on("click", function(){

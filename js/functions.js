@@ -1,31 +1,42 @@
-var ref = new Firebase("https://intercoding.firebaseio.com");
+var config = {
+  apiKey: "AIzaSyAuD-svvtckbaU54PrAh6ntfpr1TuvLDUc",
+  authDomain: "intercoding-metro.firebaseapp.com",
+  databaseURL: "https://intercoding-metro.firebaseio.com",
+  storageBucket: "intercoding-metro.appspot.com",
+};
+String.prototype.format = function (arguments) {
+    var this_string = '';
+    for (var char_pos = 0; char_pos < this.length; char_pos++) {
+        this_string = this_string + this[char_pos];
+    }
+
+    for (var key in arguments) {
+        var string_key = '{' + key + '}'
+        this_string = this_string.replace(new RegExp(string_key, 'g'), arguments[key]);
+    }
+    return this_string;
+};
+var ref = firebase.database().ref("/");
+
+$("#next").click(function() {
+  $("#console-wrapper").removeClass("right");
+  next();
+});
+
 var dataSaver;
 var uid;
 $(document).ready(function(){
-  if(!ref.getAuth()){
-    window.location.href="index.html";
-  }
-  uid = ref.getAuth().uid;
+  uid = firebase.auth().currentUser.uid;
+
   dataSaver = window.setInterval(saveCode, 10000);
 });
 
 $(window).on('unload', function() {
   window.clearInterval(dataSaver);
 });
+var myCodeMirror, consoleOut;
 
-var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourcode"), {
-  theme: "monokai",
-  value: "hi",
-  mode: "python",
-  lineNumbers: true
-  });
 
-var consoleOut = CodeMirror.fromTextArea(document.getElementById("youroutput"), {
-  theme: "monokai",
-  value: "hi",
-  mode: "SQL",
-  readOnly: true
-  });
 
 function outf(text) { 
     var mypre = consoleOut.getValue(''); 
@@ -38,16 +49,17 @@ function builtinRead(x) {
 }
 
 function runit() {
+   uid = firebase.auth().currentUser.uid;
    var prog = myCodeMirror.getValue(); 
    var mypre = document.getElementById("youroutput");
 
    var unitID = getUnit();
 
-   if (!ref.getAuth()) {
+   if (!firebase.auth().currentUser) {
      window.location.replace("index.html");
    }
    //Need lesson and unit ID in order to update the text
-   ref.child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child('code').set(prog);
+   firebase.database().ref("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child('code').set(prog);
    consoleOut.setValue(''); 
    Sk.pre = "output";
    Sk.configure({output:outf, read:builtinRead}); 
@@ -68,7 +80,7 @@ function runit() {
    $(".wrongnoti").css("display", "none")
    $("#console-wrapper").removeClass("wrong");
    $("#console-wrapper").removeClass("right");
-   ref.once('value', function(snapshot) {
+   firebase.database().ref("/").once('value', function(snapshot) {
     var temp = snapshot.child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).val();
     outputVerify = temp['output'];
     inputVerify = temp['input'];
@@ -85,7 +97,7 @@ function runit() {
         }
       }
       $("#console-wrapper").addClass("right");
-      ref.child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("completed").set(true);
+      firebase.database().ref("/").child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("completed").set(true);
     } else {
       notQuite();
     }
@@ -110,9 +122,9 @@ function addPoints(difficulty){
   } else {
     points = 25;
   }
-  ref.once("value", function(snapshot){
+  firebase.database().ref("/").once("value", function(snapshot){
     var current = snapshot.child("users").child(uid).child("score").val();
-    ref.child("users").child(uid).child("score").set(current+points);
+    firebase.database().ref("users").child(uid).child("score").set(current+points);
     $("#points").text("+"+points+" points");
     togglePoints();
     window.setTimeout(togglePoints, 2000);
@@ -128,13 +140,27 @@ function addLevel(){
 }
 
 function loadLesson() {
-  if(!ref.getAuth()){
-    window.location.href="index.html"
-  }
-  var uid = ref.getAuth().uid;
+  var uid;
   var text, code, title, output, input, alreadyCompleted;
   var unitID = getUnit();
-  ref.once('value', function(snapshot) {
+  if(!myCodeMirror){
+    myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourcode"), {
+    theme: "monokai",
+    value: "hi",
+    mode: "python",
+    lineNumbers: true
+    });
+
+  consoleOut = CodeMirror.fromTextArea(document.getElementById("youroutput"), {
+    theme: "monokai",
+    value: "hi",
+    mode: "SQL",
+    readOnly: true
+  });
+  }
+  
+  firebase.database().ref("/").once('value', function(snapshot) {
+    uid = firebase.auth().currentUser.uid;
     title = snapshot.child("units").child(unitID).child("name").val();
     var currTheme = snapshot.child("users").child(uid).child('units').child(unitID).child('theme').val();
     var generatedArray = generateArray(themes[currTheme]);
@@ -146,20 +172,20 @@ function loadLesson() {
     if (! existingText) {
       text = snapshot.child("units").child(unitID).child("lessons").child(lessonID).child("text").val();
       text = text.format({a: generatedArray[0], b: generatedArray[1], c: generatedArray[2], d: generatedArray[3], e: generatedArray[4], f: generatedArray[5], g: generatedArray[6], h: generatedArray[7], i: generatedArray[8], j: generatedArray[9]});
-      ref.child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("text").set(text);
+      firebase.database().ref("/").child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("text").set(text);
       code = snapshot.child("units").child(unitID).child("lessons").child(lessonID).child("code").val();
       code = code.format({a: generatedArray[0], b: generatedArray[1], c: generatedArray[2], d: generatedArray[3], e: generatedArray[4], f: generatedArray[5], g: generatedArray[6], h: generatedArray[7], i: generatedArray[8], j: generatedArray[9]});
-      ref.child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("code").set(code);
+      firebase.database().ref("/").child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("code").set(code);
       input = snapshot.child("units").child(unitID).child("lessons").child(lessonID).child("input").val();
       for (var i=0; i<input.length; i++) {
         input[i] = input[i].format({a: generatedArray[0], b: generatedArray[1], c: generatedArray[2], d: generatedArray[3], e: generatedArray[4], f: generatedArray[5], g: generatedArray[6], h: generatedArray[7], i: generatedArray[8], j: generatedArray[9]});
       }
-      ref.child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("input").set(input);
+      firebase.database().ref("/").child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("input").set(input);
       output = snapshot.child("units").child(unitID).child("lessons").child(lessonID).child("output").val();
       for (var i=0; i<output.length; i++) {
         output[i] = output[i].format({a: generatedArray[0], b: generatedArray[1], c: generatedArray[2], d: generatedArray[3], e: generatedArray[4], f: generatedArray[5], g: generatedArray[6], h: generatedArray[7], i: generatedArray[8], j: generatedArray[9]});
       }
-      ref.child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("output").set(output);
+      firebase.database().ref("/").child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("output").set(output);
     } else {
       text = existingText;
       code = existingCode;
@@ -190,6 +216,12 @@ function loadLesson() {
 function verifyLesson(inp, out) {
   var codeOut = consoleOut.getValue();
   var codeIn = myCodeMirror.getValue();
+  if(!out){
+    out=""
+  }
+  if(!inp){
+    inp=""
+  }
   for (var i=0; i<out.length; i++) {
     var includes = true;
     var check = out[i];
@@ -236,10 +268,11 @@ function next() {
   window.clearInterval(dataSaver);
   unitID = getUnit();
   lessonID ++;
+  console.log(lessonID);
   $("#main").css("display", "none");
   $("#next").css("display", "none")
   $(".spinner").css("display", "block");
-  ref.once('value', function(snapshot) {
+  firebase.database().ref("/").once('value', function(snapshot) {
     if (snapshot.child('units').child(unitID).child('lessons').numChildren() < lessonID) {
       window.location.replace("learning.html");
     } else if (snapshot.child("units").child(unitID).child("lessons").numChildren() === lessonID) {
@@ -270,20 +303,3 @@ function toggle() {
 function togglePoints() {
   $("#points").fadeToggle(1500);
 }
-String.prototype.format = function (arguments) {
-    var this_string = '';
-    for (var char_pos = 0; char_pos < this.length; char_pos++) {
-        this_string = this_string + this[char_pos];
-    }
-
-    for (var key in arguments) {
-        var string_key = '{' + key + '}'
-        this_string = this_string.replace(new RegExp(string_key, 'g'), arguments[key]);
-    }
-    return this_string;
-};
-
-$("#next").on('click', function() {
-  $("#console-wrapper").removeClass("right");
-  next();
-});
