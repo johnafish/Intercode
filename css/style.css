@@ -151,7 +151,7 @@ Lesson List
 /**
 Login area
 **/
-#loginarea, #signuparea{
+#loginarea, #signuparea, #createclassarea{
 	display: none;
 	background: white;
 	width: 50vw;
@@ -160,13 +160,13 @@ Login area
 	font-family: Roboto, sans-serif;
 	font-weight: 300;
 }
-#loginarea h1 , #signuparea h1{
+#loginarea h1 , #signuparea h1, #createclassarea h1{
 	text-align: center;
 	font-weight: 300;
 	font-size: 2em;
 	margin: 20px 0px;
 }
-#loginarea input , #signuparea input{
+#loginarea input , #signuparea input, #createclassarea input{
 	text-align: center;
 	width: 44vw;
 	margin: 5px 1.5vw;

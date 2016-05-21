@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Python Lessons</title>
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,300' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link rel="stylesheet" type="text/css" href="css/classes.css">
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
+	<script type="text/javascript" src="js/jquery.lightbox_me.js"></script>
+	<script type="text/javascript" src="js/circle-progress.js"></script>
+
+	<script type="text/javascript" src="js/themes.js"></script>
+	<script type="text/javascript" src="js/classes.js"></script>
+	<script type="text/javascript" src="js/menu.js"></script>
+</head>
+<body>
+<header>
+	<a id="hamburger">&#9776;</a>
+	<h1>Your Classes</h1>
+</header>
+<section id = "menu">
+<ul>
+<li><a href="#" class="active">Classes</a></li>
+<li><a href="#" onclick="firebase.auth().signOut();window.location.href=('index.html');">Logout</a></li>
+</ul>
+</section>
+<!-- <div class="spinner"></div> -->
+<section id = "classmain" style="display:block">
+<ol id = "classes">
+<li class="classitem"><h1 class="classtitle">ICS4UI-1</h1><h2 class="classcode">123144</h2><h3 class="members">23 Members, 0 Online</h3></li>
+<li class="classitem"><h1 class="classtitle">ICS4UI-2</h1><h2 class="classcode">123144</h2><h3 class="members">23 Members, 0 Online</h3></li>
+<li class="classitem"><h1 class="classtitle">ICS3UI-1</h1><h2 class="classcode">123144</h2><h3 class="members">23 Members, 0 Online</h3></li>
+<li class="newclassitem"><h1>+</h1></li>
+</ol>
+</section>
+<section id = "themes">
+<h1>Choose some interests.</h1>
+</section>
+
+<section id = "createclassarea">
+<div class="notloading">
+<h1>Create a class.</h1>
+<input placeholder="Class name" type="text" id="classname"></input>
+<br><br><br>
+<a class="button big" id="createclass">CREATE</a>
+<br>
+<br>
+<br>
+</div>
+<div class="spinner" style="display:none"></div>
+</section>
+
+</body>
+</html>
