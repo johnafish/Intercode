@@ -9,7 +9,7 @@ firebase.initializeApp(config);
 $(document).ready(function(){
 	firebase.auth().onAuthStateChanged(function(user) {
 		if(user){
-			window.location.replace("learning.html");
+			window.location.replace("learningclasses.html");
 		}
 	});
 

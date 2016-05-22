@@ -1,15 +1,6 @@
 /**
 Header
 **/
-header {
-	z-index: 2;
-	position: relative;
-	display: block;
-	background-color: #43A047;
-	padding: 1em 0px;
-	box-shadow: 0px -2px 4px 4px rgba(0,0,0,0.4);
-	font-family: Roboto, sans-serif;
-}
 header h1 {
 	margin-left: 72px;
 	color: white;
@@ -45,9 +36,9 @@ Classes
 }
 .classtitle {
 	text-align: center;
-	width: 80%;
-	margin: 15% 10%;
-	font-size: 3em;
+	width: 100%;
+	margin: 10% 0%;
+	font-size: 2.5em;
 	font-weight: 300;
 	opacity: 0.87;
 }

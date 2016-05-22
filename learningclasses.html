@@ -5,7 +5,6 @@
 	<link href='https://fonts.googleapis.com/css?family=Roboto:400,300' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 	<link rel="stylesheet" type="text/css" href="css/classes.css">
-	<link rel="stylesheet" type="text/css" href="css/teach.css">
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
@@ -13,34 +12,44 @@
 	<script type="text/javascript" src="js/circle-progress.js"></script>
 
 	<script type="text/javascript" src="js/themes.js"></script>
-	<script type="text/javascript" src="js/themegenerator.js"></script>
-	<script type="text/javascript" src="js/themeChooser.js"></script>
+	<script type="text/javascript" src="js/learningclasses.js"></script>
 	<script type="text/javascript" src="js/menu.js"></script>
-	<script type="text/javascript" src="js/class.js"></script>
 </head>
 <body>
 <header>
 	<a id="hamburger">&#9776;</a>
-	<h1 id="classtitle"></h1>
+	<h1>Your Classes</h1>
 </header>
 <section id = "menu">
 <ul>
-<li><a href="classes.html" class="active">Classes</a></li>
+<li><a href="#.html" class="active">Classes</a></li>
+<li><a href="profile.html">Profile</a></li>
 <li><a href="#" onclick="firebase.auth().signOut();window.location.href=('index.html');">Logout</a></li>
 </ul>
 </section>
 <!-- <div class="spinner"></div> -->
-<section id = "main">
-<ol id = "lessons">
-<li class="lessonitem"><div class="lessonitemleft">
-<h1 class="lessontitle">New Unit</h1>
-<span class="tag theme">DIFFICULTY</span></div>
-</div>
-<div class="lessonitemright">
-<a href="newlesson.html" onclick="newUnit()" class="button">+</a>
-</div>
-</li>
+<section id = "classmain" style="display:block">
+<ol id = "classes">
+
+<li class="newclassitem"><h1>+</h1></li>
 </ol>
 </section>
+<section id = "themes">
+<h1>Choose some interests.</h1>
+</section>
+
+<section id = "createclassarea">
+<div class="notloading">
+<h1>Join a class.</h1>
+<input placeholder="Class ID" type="text" id="classname"></input>
+<br><br><br>
+<a class="button big" id="joinclass">JOIN</a>
+<br>
+<br>
+<br>
+</div>
+<div class="spinner" style="display:none"></div>
+</section>
+
 </body>
 </html>

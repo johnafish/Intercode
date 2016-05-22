@@ -26,8 +26,6 @@ $("#next").click(function() {
 var dataSaver;
 var uid;
 $(document).ready(function(){
-  uid = firebase.auth().currentUser.uid;
-
   dataSaver = window.setInterval(saveCode, 10000);
 });
 
@@ -143,6 +141,8 @@ function loadLesson() {
   var uid;
   var text, code, title, output, input, alreadyCompleted;
   var unitID = getUnit();
+  var classID = localStorage.getItem("class");
+
   if(!myCodeMirror){
     myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourcode"), {
     theme: "monokai",
@@ -161,41 +161,31 @@ function loadLesson() {
   
   firebase.database().ref("/").once('value', function(snapshot) {
     uid = firebase.auth().currentUser.uid;
-    title = snapshot.child("units").child(unitID).child("name").val();
+    title = snapshot.child("classes/"+classID+"/units").child(unitID).child("name").val();
     var currTheme = snapshot.child("users").child(uid).child('units').child(unitID).child('theme').val();
     var generatedArray = generateArray(themes[currTheme]);
-    var existingText = snapshot.child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("text").val();
-    var existingCode = snapshot.child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("code").val();
-    var existingInput = snapshot.child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("input").val();
-    var existingOutput = snapshot.child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("output").val();
-    var alreadyCompleted = snapshot.child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("completed").val();
+
+    var existingText = snapshot.child("users").child(uid).child("classes").child(classID).child("units").child(unitID).child("lessons").child(lessonID).child("text").val();
+    var existingCode = snapshot.child("users").child(uid).child("classes").child(classID).child("units").child(unitID).child("lessons").child(lessonID).child("code").val();
+    var alreadyCompleted = snapshot.child("users").child(uid).child("classes").child(classID).child("units").child(unitID).child("lessons").child(lessonID).child("completed").val();
+    
     if (! existingText) {
-      text = snapshot.child("units").child(unitID).child("lessons").child(lessonID).child("text").val();
+      text = snapshot.child("classes/"+classID+"/units").child(unitID).child("lessons").child(lessonID).child("text").val();
       text = text.format({a: generatedArray[0], b: generatedArray[1], c: generatedArray[2], d: generatedArray[3], e: generatedArray[4], f: generatedArray[5], g: generatedArray[6], h: generatedArray[7], i: generatedArray[8], j: generatedArray[9]});
-      firebase.database().ref("/").child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("text").set(text);
-      code = snapshot.child("units").child(unitID).child("lessons").child(lessonID).child("code").val();
+      firebase.database().ref("/").child("users").child(uid).child("classes").child(classID).child("units").child(unitID).child("lessons").child(lessonID).child("text").set(text);
+      
+      code = snapshot.child("classes/"+classID+"/units").child(unitID).child("lessons").child(lessonID).child("code").val();
       code = code.format({a: generatedArray[0], b: generatedArray[1], c: generatedArray[2], d: generatedArray[3], e: generatedArray[4], f: generatedArray[5], g: generatedArray[6], h: generatedArray[7], i: generatedArray[8], j: generatedArray[9]});
-      firebase.database().ref("/").child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("code").set(code);
-      input = snapshot.child("units").child(unitID).child("lessons").child(lessonID).child("input").val();
-      for (var i=0; i<input.length; i++) {
-        input[i] = input[i].format({a: generatedArray[0], b: generatedArray[1], c: generatedArray[2], d: generatedArray[3], e: generatedArray[4], f: generatedArray[5], g: generatedArray[6], h: generatedArray[7], i: generatedArray[8], j: generatedArray[9]});
-      }
-      firebase.database().ref("/").child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("input").set(input);
-      output = snapshot.child("units").child(unitID).child("lessons").child(lessonID).child("output").val();
-      for (var i=0; i<output.length; i++) {
-        output[i] = output[i].format({a: generatedArray[0], b: generatedArray[1], c: generatedArray[2], d: generatedArray[3], e: generatedArray[4], f: generatedArray[5], g: generatedArray[6], h: generatedArray[7], i: generatedArray[8], j: generatedArray[9]});
-      }
-      firebase.database().ref("/").child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("output").set(output);
+      firebase.database().ref("/").child("users").child(uid).child("classes").child(classID).child("units").child(unitID).child("lessons").child(lessonID).child("code").set(code);
+
     } else {
       text = existingText;
       code = existingCode;
-      input = existingInput;
-      output = existingOutput;
     }
 
     if (alreadyCompleted) {
       $("#next").css("display", "inline-block");
-      if (lessonID === snapshot.child('units').child(unitID).child('lessons').numChildren()) {
+      if (lessonID === snapshot.child('classes/'+classID+'/units').child(unitID).child('lessons').numChildren()) {
         $("#next").text("FINISH");
       }
     } else {
@@ -214,49 +204,49 @@ function loadLesson() {
 }
 
 function verifyLesson(inp, out) {
-  var codeOut = consoleOut.getValue();
-  var codeIn = myCodeMirror.getValue();
-  if(!out){
-    out=""
-  }
-  if(!inp){
-    inp=""
-  }
-  for (var i=0; i<out.length; i++) {
-    var includes = true;
-    var check = out[i];
-    if (check.substring(0, 1) === '!') {
-      includes = false;
-      check = check.substring(1, check.length);
-    }
-    if (includes) {
-      if (!(codeOut.indexOf(check) > -1)) {
-        return false;
-      }
-    } else {
-      if (codeOut.indexOf(check) > -1) {
-        return false;
-      }
-    }
-  }
+  // var codeOut = consoleOut.getValue();
+  // var codeIn = myCodeMirror.getValue();
+  // if(!out){
+  //   out=""
+  // }
+  // if(!inp){
+  //   inp=""
+  // }
+  // for (var i=0; i<out.length; i++) {
+  //   var includes = true;
+  //   var check = out[i];
+  //   if (check.substring(0, 1) === '!') {
+  //     includes = false;
+  //     check = check.substring(1, check.length);
+  //   }
+  //   if (includes) {
+  //     if (!(codeOut.indexOf(check) > -1)) {
+  //       return false;
+  //     }
+  //   } else {
+  //     if (codeOut.indexOf(check) > -1) {
+  //       return false;
+  //     }
+  //   }
+  // }
 
-  for (var i=0; i<inp.length; i++) {
-    var includes = true;
-    var check = inp[i];
-    if (check.substring(0, 1) === '!') {
-      includes = false;
-      check = check.substring(1, check.length);
-    }
-    if (includes) {
-      if (!(codeIn.indexOf(check) > -1)) {
-        return false;
-      }
-    } else {
-      if (codeIn.indexOf(check) > -1) {
-        return false;
-      }
-    }
-  }
+  // for (var i=0; i<inp.length; i++) {
+  //   var includes = true;
+  //   var check = inp[i];
+  //   if (check.substring(0, 1) === '!') {
+  //     includes = false;
+  //     check = check.substring(1, check.length);
+  //   }
+  //   if (includes) {
+  //     if (!(codeIn.indexOf(check) > -1)) {
+  //       return false;
+  //     }
+  //   } else {
+  //     if (codeIn.indexOf(check) > -1) {
+  //       return false;
+  //     }
+  //   }
+  // }
   return true;
 }
 
@@ -287,9 +277,10 @@ function next() {
 
 function saveCode() {
   var unitID = getUnit();
+  var classID = localStorage.getItem("class");
   var code = myCodeMirror.getValue();
   autosaved();
-  ref.child("users").child(uid).child("units").child(unitID).child("lessons").child(lessonID).child("code").set(code);
+  firebase.database().ref("/").child("users").child(uid).child("classes").child(classID).child("units").child(unitID).child("lessons").child(lessonID).child("code").set(code);
 }
 
 function autosaved() {
