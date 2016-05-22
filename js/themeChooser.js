@@ -1,13 +1,20 @@
-var ref = new Firebase("https://intercoding.firebaseio.com");
+var config = {
+	apiKey: "AIzaSyAuD-svvtckbaU54PrAh6ntfpr1TuvLDUc",
+	authDomain: "intercoding-metro.firebaseapp.com",
+	databaseURL: "https://intercoding-metro.firebaseio.com",
+	storageBucket: "intercoding-metro.appspot.com",
+};
+firebase.initializeApp(config);
 var uid;
+
 $(document).ready(function(){
-	if(!ref.getAuth()){
-		window.location.href="index.html";
+
+	if(!firebase.auth().currentUser){
+		// window.location.href="index.html";
 	}
-	uid = ref.getAuth().uid;
 	var activeThemes;
-	ref.once("value", function(snapshot){
-		activeThemes = snapshot.child("users").child(uid).child("active").val();
+	firebase.database().ref("users").once("value", function(snapshot){
+		activeThemes = snapshot.child(firebase.auth().currentUser.uid+"/active").val();
 		populateThemes(activeThemes);
 	});
 	
@@ -46,19 +53,19 @@ function populateThemes(active){
 function addTheme(theme){
 	if ($("."+theme).hasClass("active")){
 		$("."+theme).removeClass("active");
-		ref.once("value", function(snapshot){
-			var value = snapshot.child("users").child(uid).child("active").val()
+		firebase.database().ref("users").once("value", function(snapshot){
+			var value = snapshot.child(firebase.auth().currentUser.uid).child("active").val()
 			for (var key in value) {
 				if (value[key]!=theme){
 					continue
 				} else {
-					ref.child("users").child(uid).child("active").child(key).remove();
+					firebase.database().ref("users").child(firebase.auth().currentUser.uid).child("active").child(key).remove();
 				}
 			}
 			
 		});
 	} else {
-		var pushRef = ref.child("users").child(uid).child("active").push();
+		var pushRef = firebase.database().ref("users").child(firebase.auth().currentUser.uid).child("active").push();
 			$("."+theme).addClass("active");
 			pushRef.set(theme);
 	}

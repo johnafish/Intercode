@@ -2,6 +2,8 @@
 <head>
 <link rel="stylesheet" href="codemirror-5.12/lib/codemirror.css" >
 <link rel="stylesheet" type="text/css" href="css/style.css">
+<link rel="stylesheet" type="text/css" href="css/classes.css">
+<link rel="stylesheet" type="text/css" href="css/teach.css">
 <title>Intercode Lesson</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
@@ -13,45 +15,32 @@
 <script type="text/javascript" src="js/menu.js"></script>
 <link rel="stylesheet" href="codemirror-5.12/theme/monokai.css" >
 <script type="text/javascript" src="codemirror-5.12/mode/python/python.js"></script>
-<script type="text/javascript" src="js/themegenerator.js"></script>
-<script type="text/javascript" src="js/themes.js"></script>
-<script type="text/javascript" src="js/themeChooser.js"></script>
-
+<script type="text/javascript" src="js/newclass.js"></script>
 
 </head> 
 <script type="text/javascript">
-	var lessonID = 1;
-	$(document).ready(function() {
-		loadLesson();
-	})
+	localStorage.setItem("lesson", "1");
 </script>
-
 <body>
 <header>
 	<a id="hamburger">&#9776;</a>
-	<h1>Loading...</h1>
+	<h1 id = "lessontitle" contenteditable="true">Lesson Title</h1>
 </header>
 <section id = "menu">
 <ul>
-<li><a href="learning.html">Lessons</a></li>
-<li><a href="learningclasses.html">Classes</a></li>
-<li><a href="profile.html">Profile</a></li>
+<li><a href="class.html">Units</a></li>
+<li><a href="classes.html">Classes</a></li>
 <li><a href="#" onclick="firebase.auth().signOut();window.location.href=('index.html');">Logout</a></li>
 </ul>
 </section>
-<div class="spinner"></div>
-<section id="main" style="display:none">
-<div id="lesson-text">
-This is the lesson text :)
+<section id="main">
+<div id="lesson-text" contenteditable="true">
+Lesson text goes here.
 </div>
 <form id="codeEditor">
 <div id="editor-wrapper">
 <textarea id="yourcode" cols="40" rows="10">
-#Sample code goes here:
-def sample(h):
-  print(h)
-
-sample("blah")
+#Sample code goes here
 </textarea>
 <div id="button-wrapper">
 <a id="go" class="button run" onclick="runit()">Run</a>
@@ -59,7 +48,7 @@ sample("blah")
 </div>
 <div id="console-wrapper">
 <textarea id="youroutput" cols="40" rows="2">
-#Output goes here
+#Output will go here
 </textarea></div>
 
 </form>
@@ -73,10 +62,8 @@ sample("blah")
 <span class="wrongnoti">Hmm, something doesn't look right.</span>
 </section>
 <section id="next-wrapper">
-<a href="#" class="button" id="next" style="display: none;">NEXT</a>
+<a href="#" class="button" id="next">NEXT</a>
 </section>
-
-<script type="text/javascript" src="js/functions.js"></script>
 
 </body>
 

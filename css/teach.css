@@ -1,0 +1,51 @@
+/**
+Main splash page
+**/
+#mainheader {
+	text-align: center;
+	min-height: 75vh;
+	color: white;
+	box-shadow: initial;
+	background-color:#43A047;
+}
+#mainheader h1 {
+	text-align: center;
+	margin-left: 0px;
+	padding: 0px;
+	font-size: 4em;
+	line-height: 40vh;
+}
+#mainheader h2 {
+	opacity: 0.57;
+	font-weight: 300;
+	text-align: center;
+}
+#getstarted {
+	margin-top: 5em;
+}
+.descriptor-wrapper {
+	background-color:#43A047;
+	height: 25vh;
+	text-align: center;
+}
+.descriptor {
+	opacity: 0.32;
+	font-family: Roboto, sans-serif;
+	font-size: 1.2em;
+	font-weight: 300;
+	text-align: center;
+	width: 100vw;
+	color: white;
+}
+.descriptor a:visited, .descriptor a {
+	color: white;
+}
+header {
+	z-index: 2;
+	position: relative;
+	display: block;
+	background-color: #43A047;
+	padding: 1em 0px;
+	box-shadow: 0px -2px 4px 4px rgba(0,0,0,0.4);
+	font-family: Roboto, sans-serif;
+}

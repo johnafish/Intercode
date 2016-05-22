@@ -1,18 +1,25 @@
-var ref = new Firebase("https://intercoding.firebaseio.com");
+var config = {
+	apiKey: "AIzaSyAuD-svvtckbaU54PrAh6ntfpr1TuvLDUc",
+	authDomain: "intercoding-metro.firebaseapp.com",
+	databaseURL: "https://intercoding-metro.firebaseio.com",
+	storageBucket: "intercoding-metro.appspot.com",
+};
+
 var uid;
 $(document).ready(function(){
-	if(!ref.getAuth()){
-		window.location.replace("index.html");
-	}
-	uid = ref.getAuth().uid;
 	var level;
-	ref.once("value", function(snapshot){
-		level = snapshot.child("users").child(uid).child("unlocked").val();
-		if(!level){
-			ref.child("users").child(uid).child("unlocked").set(1);
-			level = 1;
+	var classCurrent = localStorage.getItem("class");
+	firebase.database().ref("/").once("value", function(snapshot){
+		uid = firebase.auth().currentUser.uid;
+		level = snapshot.child("classes/"+classCurrent+"/members/"+uid).val();
+		
+		if(!snapshot.child("users/"+uid).child("active")){
+			firebase.database().ref("users/"+uid+"/active").push().set("default")
+			numThemes = 1
+		} else {
+			var numThemes = objectToList(snapshot.child("users/"+uid).child("active").val()).length;
+
 		}
-		var numThemes = objectToList(snapshot.child("users").child(uid).child("active").val()).length;
 		if (numThemes === 1) {
 			displayChoices();
 		}
@@ -21,14 +28,14 @@ $(document).ready(function(){
 		$(".spinner").css("display", "none");
 		try{
 			for (var i = 1; i <= level; i++) {
-				var lesson = snapshot.child("units").child(i).val();
+				var lesson = snapshot.child("classes/"+classCurrent+"/units").child(i).val();
 				var theme = snapshot.child("users").child(uid).child('units').child(i).child('theme').val();
 				if (!theme) {
 					var active = snapshot.child("users").child(uid).child("active").val();
 					theme = generateUnit(objectToList(active));
-					ref.child("users").child(uid).child('units').child(i).child('theme').set(theme);
+					firebase.database().ref("users").child(uid).child('units').child(i).child('theme').set(theme);
 				}
-				var numLessonsCompleted = snapshot.child("users").child(uid).child("units").child(i).child("lessons").numChildren();
+				var numLessonsCompleted = snapshot.child("classes/"+classCurrent+"/members").child(uid).child("units").child(i).child("lessons").numChildren();
 				if(numLessonsCompleted>0){
 					var lastValue = snapshot.child("users").child(uid).child("units").child(i).child("lessons").child(numLessonsCompleted).child("completed").val();
 					if(!lastValue){
@@ -37,6 +44,10 @@ $(document).ready(function(){
 				}
 				var numLessonsTotal = snapshot.child("units").child(i).child("lessons").numChildren();
 				console.log(numLessonsCompleted/numLessonsTotal)
+				if(!lesson.difficulty){
+					lesson.difficulty = "DIFFICULTY"
+				}
+				console.log(lesson.name, theme.toUpperCase(), lesson.difficulty, i, (numLessonsCompleted/numLessonsTotal))
 				createLesson(lesson.name, theme.toUpperCase(), lesson.difficulty, i, (numLessonsCompleted/numLessonsTotal));
 			}
 		} catch(e){

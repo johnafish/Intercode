@@ -2,6 +2,9 @@ function generateUnit(activeThemes) {
 	var r = Math.floor(Math.random() * activeThemes.length);
 	var chosen = activeThemes[r];
 	console.log(activeThemes.length);
+	if(activeThemes.length==0){
+		chosen = "default"
+	}
 	if (activeThemes.length > 1) {
 		while (chosen === 'default') {
 			r = Math.floor(Math.random() * activeThemes.length);
